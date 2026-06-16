@@ -1,0 +1,359 @@
+<!-- Summer Cut Plan — performance dashboard, single-file HTML artifact -->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Summer Cut Plan</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#15181E; --ink-soft:#3C424B; --paper:#F3F4F1; --card:#FFFFFF;
+    --line:#E6E7E1; --muted:#8A9099;
+    --gym:#E8551B; --gym-tint:#FDEEE6;
+    --bjj:#97283C; --bjj-tint:#F8E8EB;
+    --soccer:#2E8B57; --soccer-tint:#E6F2EB;
+    --rest:#98A0A8; --rest-tint:#EEF0F1;
+    --disp:'Barlow Condensed',system-ui,sans-serif;
+    --body:'Inter',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:var(--body);line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+
+  /* ---------- HERO ---------- */
+  .hero{background:var(--ink);color:#fff;padding:46px 0 38px;position:relative;overflow:hidden}
+  .hero:before{content:"";position:absolute;right:-80px;top:-80px;width:320px;height:320px;
+    background:radial-gradient(circle,rgba(232,85,27,.35),transparent 62%);pointer-events:none}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--gym);font-weight:700;margin:0 0 10px}
+  .hero h1{font-family:var(--disp);font-weight:700;font-size:clamp(56px,13vw,108px);
+    line-height:.88;letter-spacing:-.01em;margin:0;text-transform:uppercase}
+  .hero p.lede{margin:14px 0 0;font-size:17px;color:#C9CDD4;max-width:46ch}
+  .statrow{display:flex;flex-wrap:wrap;gap:30px;margin-top:30px;border-top:1px solid rgba(255,255,255,.13);padding-top:24px}
+  .stat .num{font-family:var(--disp);font-weight:700;font-size:46px;line-height:1;letter-spacing:-.01em}
+  .stat .num .to{color:var(--gym)}
+  .stat .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#9AA0A8;margin-top:8px}
+
+  /* ---------- NAV ---------- */
+  nav{position:sticky;top:0;z-index:20;background:rgba(243,244,241,.86);
+    backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;gap:8px;padding-top:10px;padding-bottom:10px;overflow-x:auto}
+  nav a{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);text-decoration:none;padding:7px 13px;border-radius:99px;white-space:nowrap;font-weight:500}
+  nav a:hover{background:#fff;color:var(--ink)}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:46px 0 8px}
+  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  .shead .idx{font-family:var(--mono);font-size:13px;color:var(--gym);font-weight:700}
+  .shead h2{font-family:var(--disp);font-weight:700;font-size:clamp(30px,6vw,44px);
+    text-transform:uppercase;letter-spacing:-.01em;margin:0;line-height:1}
+  .shead .note{margin-left:auto;font-size:13.5px;color:var(--muted);max-width:34ch;text-align:right}
+
+  /* ---------- WEEK STRIP ---------- */
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px}
+  .legend span{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-soft);display:inline-flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .week{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+  .day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 12px 16px;
+    border-top:4px solid var(--rest);min-height:128px;display:flex;flex-direction:column;position:relative}
+  .day .dow{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .day .sess{font-family:var(--disp);font-weight:600;font-size:21px;line-height:1.02;text-transform:uppercase;margin-top:auto}
+  .day .sub{font-size:11.5px;color:var(--ink-soft);margin-top:5px}
+  .day.gym{border-top-color:var(--gym)} .day.gym .sess{color:var(--gym)}
+  .day.bjj{border-top-color:var(--bjj)} .day.bjj .sess{color:var(--bjj)}
+  .day.soccer{border-top-color:var(--soccer)} .day.soccer .sess{color:var(--soccer)}
+  .day.rest{border-top-color:var(--rest)} .day.rest .sess{color:var(--rest)}
+  .day.is-today{box-shadow:0 0 0 2px var(--ink);transform:translateY(-3px)}
+  .todaytag{position:absolute;top:10px;right:10px;font-family:var(--mono);font-size:9px;font-weight:700;
+    letter-spacing:.1em;background:var(--ink);color:#fff;padding:3px 7px;border-radius:99px}
+
+  /* ---------- GYM CARDS ---------- */
+  .cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .gcard{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .gcard .top{padding:16px 18px;border-bottom:1px solid var(--line);background:var(--gym-tint)}
+  .gcard .top .when{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gym);font-weight:700}
+  .gcard .top .ttl{font-family:var(--disp);font-weight:700;font-size:26px;text-transform:uppercase;line-height:1;margin-top:4px}
+  .gcard .prog{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:8px}
+  ul.ex{list-style:none;margin:0;padding:6px 8px 10px;flex:1}
+  ul.ex li{display:flex;gap:11px;align-items:flex-start;padding:9px 10px;border-radius:9px;cursor:pointer;user-select:none}
+  ul.ex li:hover{background:#FAFAF8}
+  .box{flex:none;width:19px;height:19px;border:2px solid #CBCFCB;border-radius:6px;margin-top:1px;
+    display:grid;place-items:center;transition:.15s}
+  .box:after{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;
+    transform:rotate(-45deg) scale(0);transition:transform .15s}
+  .ex li.done .box{background:var(--gym);border-color:var(--gym)}
+  .ex li.done .box:after{transform:rotate(-45deg) scale(1)}
+  .ex .name{font-size:14px;font-weight:500;color:var(--ink)}
+  .ex .name b{font-family:var(--mono);font-weight:700;font-size:12px;color:var(--gym);margin-left:2px}
+  .ex li.done .name{color:var(--muted);text-decoration:line-through}
+  .heavy{margin:0 0 20px;font-size:14.5px;color:var(--ink-soft);background:#fff;border:1px solid var(--line);
+    border-left:4px solid var(--gym);border-radius:10px;padding:13px 16px}
+  .heavy b{color:var(--ink)}
+
+  /* ---------- MACROS ---------- */
+  .macros{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .mc{background:var(--ink);color:#fff;border-radius:14px;padding:18px 16px}
+  .mc .v{font-family:var(--disp);font-weight:700;font-size:42px;line-height:.9}
+  .mc .v small{font-size:18px;color:#9AA0A8;font-weight:600}
+  .mc .k{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gym);margin-top:10px;font-weight:700}
+  .mc .why{font-size:11.5px;color:#B9BDC4;margin-top:4px}
+  .mc:first-child{background:var(--gym)} .mc:first-child .k{color:#fff} .mc:first-child .why{color:#FCE4D8}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+  .panel h3{font-family:var(--disp);font-weight:700;font-size:20px;text-transform:uppercase;letter-spacing:.01em;margin:0 0 12px}
+  .wed{border-left:4px solid var(--soccer)}
+  .wed h3{color:var(--soccer)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{font-size:13px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:6px 13px;color:var(--ink-soft)}
+
+  .timeline{list-style:none;margin:0;padding:0}
+  .timeline li{display:flex;gap:14px;padding:11px 0;border-bottom:1px dashed var(--line)}
+  .timeline li:last-child{border-bottom:0}
+  .timeline .meal{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--gym);font-weight:700;width:104px;flex:none;padding-top:2px}
+  .timeline .desc{font-size:14px}
+  .timeline .desc .p{font-family:var(--mono);font-size:11px;color:var(--muted);margin-left:6px}
+
+  .lazy{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .lazy div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:14px}
+  .lazy .n{font-family:var(--disp);font-weight:700;font-size:18px;color:var(--gym)}
+
+  /* ---------- ADJUST ---------- */
+  .rules{display:grid;gap:10px}
+  .rule{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;
+    background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+  .rule .if{font-size:14px}
+  .rule .arrow{font-family:var(--mono);color:var(--gym);font-weight:700}
+  .rule .then{font-size:14px;font-weight:600}
+  .rule.good{border-left:4px solid var(--soccer)}
+  .rule.trim{border-left:4px solid var(--gym)}
+  .rule.add{border-left:4px solid var(--bjj)}
+  .twoup{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .reminder{background:var(--ink);color:#fff;border-radius:14px;padding:18px 20px}
+  .reminder .big{font-family:var(--disp);font-weight:700;font-size:30px;text-transform:uppercase;line-height:1}
+  .reminder .big span{color:var(--gym)}
+  .reminder p{margin:8px 0 0;font-size:13.5px;color:#C2C6CC}
+
+  footer{padding:36px 0 60px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);margin-top:30px}
+
+  /* ---------- MOTION ---------- */
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  section{animation:rise .5s ease both}
+  .day{animation:rise .45s ease both}
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+  /* ---------- RESPONSIVE ---------- */
+  @media(max-width:780px){
+    .week{grid-template-columns:repeat(4,1fr)}
+    .cards3{grid-template-columns:1fr}
+    .macros{grid-template-columns:1fr 1fr}
+    .lazy{grid-template-columns:1fr}
+    .twoup{grid-template-columns:1fr}
+    .shead .note{display:none}
+  }
+  @media(max-width:460px){
+    .week{grid-template-columns:repeat(2,1fr)}
+    .rule{grid-template-columns:1fr;gap:6px}
+    .rule .arrow{justify-self:start}
+  }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">7.5-Week Training Block · ends Aug 7</p>
+    <h1>Summer<br>Cut</h1>
+    <p class="lede">Lose fat, keep every pound of muscle, never show up flat on the mat or the pitch.</p>
+    <div class="statrow">
+      <div class="stat"><div class="num">23<small>%</small> <span class="to">→ 20<small>%</small></span></div><div class="lbl">Body fat target (18% stretch)</div></div>
+      <div class="stat"><div class="num">~1<small> lb</small></div><div class="lbl">Loss per week</div></div>
+      <div class="stat"><div class="num">6<span class="to">+1</span></div><div class="lbl">Train days / rest</div></div>
+    </div>
+  </div>
+</header>
+
+<nav><div class="wrap">
+  <a href="#week">The Week</a>
+  <a href="#gym">Gym Sessions</a>
+  <a href="#food">Nutrition</a>
+  <a href="#adjust">Track &amp; Adjust</a>
+</div></nav>
+
+<main class="wrap">
+
+  <!-- WEEK -->
+  <section id="week">
+    <div class="shead"><span class="idx">01</span><h2>The Week</h2>
+      <span class="note">Soccer is your cardio. Heavy legs sit Friday so they recover before Tuesday.</span></div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--gym)"></i>Gym</span>
+      <span><i class="dot" style="background:var(--bjj)"></i>BJJ</span>
+      <span><i class="dot" style="background:var(--soccer)"></i>Soccer</span>
+      <span><i class="dot" style="background:var(--rest)"></i>Rest</span>
+    </div>
+    <div class="week" id="weekStrip">
+      <div class="day gym"   data-dow="1"><div class="dow">Mon</div><div class="sess">Upper<br>Push</div><div class="sub">Gym · heavy</div></div>
+      <div class="day bjj"   data-dow="2"><div class="dow">Tue</div><div class="sess">BJJ</div><div class="sub">Rolls</div></div>
+      <div class="day soccer" data-dow="3"><div class="dow">Wed</div><div class="sess">Soccer</div><div class="sub">+carbs to fuel</div></div>
+      <div class="day bjj"   data-dow="4"><div class="dow">Thu</div><div class="sess">BJJ</div><div class="sub">Rolls</div></div>
+      <div class="day gym"   data-dow="5"><div class="dow">Fri</div><div class="sess">Legs<br>+ Core</div><div class="sub">Gym · moderate</div></div>
+      <div class="day gym"   data-dow="6"><div class="dow">Sat</div><div class="sess">Upper<br>Pull</div><div class="sub">Gym · heavy*</div></div>
+      <div class="day rest"  data-dow="0"><div class="dow">Sun</div><div class="sess">Rest</div><div class="sub">Recover</div></div>
+    </div>
+    <p class="note" style="color:var(--muted);font-size:13px;margin-top:14px">*Relief valve: if you're run down — weak rolls, bad sleep, lingering soreness — drop Saturday or swap it for mobility. Recovery is the limiter in a deficit, not effort. And hit <b style="color:var(--ink-soft)">8–10k steps/day</b>.</p>
+  </section>
+
+  <!-- GYM -->
+  <section id="gym">
+    <div class="shead"><span class="idx">02</span><h2>Gym Sessions</h2>
+      <span class="note">Tap each exercise to check it off as you go.</span></div>
+    <p class="heavy"><b>The one rule that matters:</b> keep the weights heavy and try to add load week to week. That's the signal that holds your muscle while fat comes off — don't turn these into light "fat-burning" circuits.</p>
+    <div class="cards3" id="gymCards">
+
+      <div class="gcard">
+        <div class="top"><div class="when">Monday</div><div class="ttl">Upper · Push</div><div class="prog">0 / 6 done</div></div>
+        <ul class="ex">
+          <li><span class="box"></span><span class="name">Incline DB/BB press <b>4×6–10</b></span></li>
+          <li><span class="box"></span><span class="name">Flat DB press or dips <b>3×8–12</b></span></li>
+          <li><span class="box"></span><span class="name">Seated DB shoulder press <b>3×8–12</b></span></li>
+          <li><span class="box"></span><span class="name">Lat pulldown / pull-ups <b>3×8–12</b></span></li>
+          <li><span class="box"></span><span class="name">Lateral raises <b>3×12–15</b></span></li>
+          <li><span class="box"></span><span class="name">Triceps pushdown <b>3×12–15</b></span></li>
+        </ul>
+      </div>
+
+      <div class="gcard">
+        <div class="top"><div class="when">Friday</div><div class="ttl">Legs + Core</div><div class="prog">0 / 6 done</div></div>
+        <ul class="ex">
+          <li><span class="box"></span><span class="name">Squat / hack / leg press <b>3×6–10</b></span></li>
+          <li><span class="box"></span><span class="name">Romanian deadlift <b>3×8–10</b></span></li>
+          <li><span class="box"></span><span class="name">Bulgarian split squat <b>2×10–12</b></span></li>
+          <li><span class="box"></span><span class="name">Leg curl <b>3×12–15</b></span></li>
+          <li><span class="box"></span><span class="name">Standing calf raise <b>3×12–15</b></span></li>
+          <li><span class="box"></span><span class="name">Hanging leg raise <b>3×12–15</b></span></li>
+        </ul>
+      </div>
+
+      <div class="gcard">
+        <div class="top"><div class="when">Saturday</div><div class="ttl">Upper · Pull</div><div class="prog">0 / 5 done</div></div>
+        <ul class="ex">
+          <li><span class="box"></span><span class="name">Weighted pull-ups / pulldown <b>4×6–10</b></span></li>
+          <li><span class="box"></span><span class="name">Chest-supported row <b>4×8–12</b></span></li>
+          <li><span class="box"></span><span class="name">Face pulls <b>3×15</b></span></li>
+          <li><span class="box"></span><span class="name">Incline DB curl <b>3×10–12</b></span></li>
+          <li><span class="box"></span><span class="name">Hammer curl <b>3×10–12</b></span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="note" style="color:var(--muted);font-size:13px;margin-top:14px">Friday's leg volume is deliberately trimmed — soccer and both BJJ days already load your legs hard. A full heavy leg day on top would wreck recovery.</p>
+  </section>
+
+  <!-- FOOD -->
+  <section id="food">
+    <div class="shead"><span class="idx">03</span><h2>Nutrition · No Stove</h2>
+      <span class="note">Microwave + no-cook covers everything here.</span></div>
+
+    <div class="macros">
+      <div class="mc"><div class="v">2,100</div><div class="k">Calories / day</div><div class="why">~450 deficit · ~1 lb/wk</div></div>
+      <div class="mc"><div class="v">180<small>g</small></div><div class="k">Protein</div><div class="why">~1 g/lb · non-negotiable</div></div>
+      <div class="mc"><div class="v">200<small>g</small></div><div class="k">Carbs</div><div class="why">fuel · skew to training</div></div>
+      <div class="mc"><div class="v">65<small>g</small></div><div class="k">Fat</div><div class="why">hormone floor</div></div>
+    </div>
+
+    <div class="panel wed">
+      <h3>Wednesday Tweak</h3>
+      <p style="margin:0;font-size:14.5px;color:var(--ink-soft)">Add <b>+100–150 kcal of carbs</b> on soccer day — extra rice pouch, banana, or oats — so you have fuel to play. Soccer also burns 500–800+ kcal, so if you start dropping faster than ~1.25 lb/wk or feel gassed, the fix is <b>eat more, don't train more.</b></p>
+    </div>
+
+    <div class="panel">
+      <h3>No-Stove Protein Staples</h3>
+      <div class="chips">
+        <span class="chip">Rotisserie chicken</span><span class="chip">Grilled chicken strips</span>
+        <span class="chip">Greek yogurt / skyr</span><span class="chip">Cottage cheese</span>
+        <span class="chip">Canned tuna / salmon</span><span class="chip">Pre-boiled eggs</span>
+        <span class="chip">Whey + casein</span><span class="chip">Frozen meatballs/shrimp</span>
+        <span class="chip">Edamame · beans</span><span class="chip">Deli turkey</span>
+        <span class="chip">String cheese · jerky</span><span class="chip">Quest / Barebells bars</span>
+      </div>
+      <p style="margin:14px 0 0;font-size:13px;color:var(--muted)">Carbs &amp; veg, no cook: microwave rice/quinoa pouches · microwave potatoes · steam-bag frozen veg · salad kits · overnight oats · fruit. <i>Optional:</i> air fryer (~$50) or rice cooker (~$25) unlock real cooked meals.</p>
+    </div>
+
+    <div class="panel">
+      <h3>Sample Day · ~2,100 kcal / ~180g P</h3>
+      <ul class="timeline">
+        <li><span class="meal">Breakfast</span><span class="desc">Overnight oats — 1.5 cups Greek yogurt + 1 scoop whey + ½ cup oats + berries<span class="p">~45g P</span></span></li>
+        <li><span class="meal">Lunch</span><span class="desc">6 oz rotisserie chicken + microwave rice pouch + steam-bag broccoli + olive oil<span class="p">~50g P</span></span></li>
+        <li><span class="meal">Snack</span><span class="desc">Cottage cheese + fruit, or shake + small handful almonds<span class="p">~30g P</span></span></li>
+        <li><span class="meal">Dinner</span><span class="desc">Canned salmon or chicken strips over a salad kit + microwave sweet potato<span class="p">~45g P</span></span></li>
+        <li><span class="meal">Pre-bed</span><span class="desc">Optional string cheese or casein<span class="p">~15g P</span></span></li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h3>Sub-5-Minute Lazy Meals</h3>
+      <div class="lazy">
+        <div><span class="n">01</span><br>Tuna + microwave rice pouch + hot sauce</div>
+        <div><span class="n">02</span><br>Greek yogurt + protein powder + frozen berries</div>
+        <div><span class="n">03</span><br>Deli turkey + cheese + a microwave potato</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADJUST -->
+  <section id="adjust">
+    <div class="shead"><span class="idx">04</span><h2>Track &amp; Adjust</h2>
+      <span class="note">Weigh 3–4 mornings/week, same conditions, average the week.</span></div>
+    <p class="heavy" style="border-left-color:var(--ink)">The 2,100 is an estimate. After <b>2 weeks</b>, check the weekly average against these rules. <b>Protein stays fixed</b> — only ever move carbs and fat.</p>
+    <div class="rules">
+      <div class="rule good"><div class="if">Lost ~1.5–2 lb total</div><div class="arrow">→</div><div class="then">Dialed in — hold steady</div></div>
+      <div class="rule trim"><div class="if">Scale flat (and not just water)</div><div class="arrow">→</div><div class="then">Trim ~150 kcal off carbs/fat</div></div>
+      <div class="rule add"><div class="if">Dropping &gt;1.25 lb/wk <i>or</i> weak rolls &amp; trashed recovery</div><div class="arrow">→</div><div class="then">Add ~150 kcal back</div></div>
+    </div>
+    <div class="twoup">
+      <div class="reminder"><div class="big">Sleep <span>7–9h</span></div><p>With 6 training days, recovery is what lets you keep the muscle and keep showing up. It's not optional.</p></div>
+      <div class="reminder"><div class="big">Judge the <span>average</span></div><p>Week 1 drops more (water) and the scale bounces daily. Trust the weekly trend and how you look &amp; perform — not single readings.</p></div>
+    </div>
+  </section>
+
+  <footer>
+    Built for Theo · 5'8", 174.9 lb, 23.1% BF, 75.8 lb SMM. The high muscle mass is the asset — every decision here protects it. Adjust as the scale and your training tell you to.
+  </footer>
+</main>
+
+<script>
+  // Highlight today's card
+  (function(){
+    var today = new Date().getDay(); // 0 Sun .. 6 Sat
+    document.querySelectorAll('#weekStrip .day').forEach(function(d, i){
+      d.style.animationDelay = (i*0.05)+'s';
+      if(parseInt(d.dataset.dow,10) === today){
+        d.classList.add('is-today');
+        var t = document.createElement('span');
+        t.className = 'todaytag'; t.textContent = 'TODAY';
+        d.appendChild(t);
+      }
+    });
+  })();
+
+  // Checkable exercises (in-memory only — resets on reload)
+  document.querySelectorAll('#gymCards .gcard').forEach(function(card){
+    var items = card.querySelectorAll('ul.ex li');
+    var prog = card.querySelector('.prog');
+    var total = items.length;
+    function refresh(){
+      var done = card.querySelectorAll('ul.ex li.done').length;
+      prog.textContent = done + ' / ' + total + ' done';
+    }
+    items.forEach(function(li){
+      li.addEventListener('click', function(){ li.classList.toggle('done'); refresh(); });
+    });
+  });
+</script>
